@@ -8,14 +8,26 @@ export class ProductsService {
   constructor(private prisma: PrismaService) { }
 
   async create(createProductDto: CreateProductDto) {
+    const { tagIds, categoryId, ...productData } = createProductDto;
+
     return this.prisma.product.create({
-      data: createProductDto,
+      data: {
+        ...productData,
+
+        category: categoryId ? {
+          connect: { id: categoryId }
+        } : undefined,
+
+        tags: tagIds && tagIds.length > 0 ? {
+          connect: tagIds.map((id) => ({ id }))
+        } : undefined
+      }
     });
   }
 
   async findAll() {
     return this.prisma.product.findMany({
-      include: { category: true },
+      include: { category: true, tags: true },
     });
   }
 
