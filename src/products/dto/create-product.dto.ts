@@ -9,4 +9,8 @@ export class CreateProductDto {
 
     @IsOptional()
     description: string;
+
+    @IsOptional()
+    @IsNumber()
+    categoryId?: number;
 }

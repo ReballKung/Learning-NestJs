@@ -14,7 +14,9 @@ export class ProductsService {
   }
 
   async findAll() {
-    return this.prisma.product.findMany();
+    return this.prisma.product.findMany({
+      include: { category: true },
+    });
   }
 
   async findOne(id: number) {
