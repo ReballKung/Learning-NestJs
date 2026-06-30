@@ -7,9 +7,10 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ProductsModule } from './products/products.module';
 import { CategoriesModule } from './categories/categories.module';
 import { TagsModule } from './tags/tags.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [UsersModule, EmployeesModule, PrismaModule, ProductsModule, CategoriesModule, TagsModule],
+  imports: [UsersModule, EmployeesModule, PrismaModule, ProductsModule, CategoriesModule, TagsModule, AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })
