@@ -1,4 +1,5 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -6,17 +7,20 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) { }
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+  ) { }
 
   async register(createAuthDto: CreateAuthDto) {
     const { email, password, name } = createAuthDto;
 
     const existingUser = await this.prisma.user.findUnique({
-      where: { email }
+      where: { email },
     });
 
     if (existingUser) {
-      throw new ConflictException('อีเมลนี้ถูกใช้งานแล้ว')
+      throw new ConflictException('อีเมลนี้ถูกใช้งานแล้ว');
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -33,6 +37,39 @@ export class AuthService {
     const { password: _, ...result } = newUser
 
     return result;
+  }
+
+  async login(email: string, password: string) {
+    const findUser = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!findUser) {
+      throw new UnauthorizedException('ไม่พบอีเมลในระบบ');
+    }
+
+    const findPassword = await bcrypt.compare(password, findUser.password);
+
+    if (!findPassword) {
+      throw new UnauthorizedException('รหัสผ่านไม่ถูกต้อง');
+    }
+
+    const payload = {
+      email: email,
+      password: password,
+    };
+
+    const token = this.jwtService.sign(payload);
+
+    return {
+      success: true,
+      message: 'เข้าสู่ระบบสำเร็จ',
+      result: {
+        name: findUser.name,
+        email: findUser.email,
+        accessToken: token,
+      },
+    };
   }
 
   create(createAuthDto: CreateAuthDto) {

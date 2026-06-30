@@ -14,3 +14,12 @@ export class CreateAuthDto {
     @IsString()
     role: string;
 }
+
+export class loginAuthDTO {
+    @IsEmail()
+    email: string;
+
+    @IsString()
+    @MinLength(6)
+    password: string;
+}
