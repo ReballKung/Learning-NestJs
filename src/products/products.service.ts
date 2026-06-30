@@ -7,12 +7,15 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ProductsService {
   constructor(private prisma: PrismaService) { }
 
-  async create(createProductDto: CreateProductDto) {
+  async create(createProductDto: CreateProductDto, userId: number) {
     const { tagIds, categoryId, ...productData } = createProductDto;
 
     return this.prisma.product.create({
       data: {
         ...productData,
+        user: {
+          connect: { id: userId },
+        },
 
         category: categoryId ? {
           connect: { id: categoryId }
