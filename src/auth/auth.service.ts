@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
@@ -10,7 +14,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   async register(createAuthDto: CreateAuthDto) {
     const { email, password, name } = createAuthDto;
@@ -34,7 +38,7 @@ export class AuthService {
       },
     });
 
-    const { password: _, ...result } = newUser
+    const { password: _, ...result } = newUser;
 
     return result;
   }
@@ -58,6 +62,7 @@ export class AuthService {
       email: email,
       password: password,
       userId: findUser.id,
+      role: findUser.role,
     };
 
     const token = this.jwtService.sign(payload);
